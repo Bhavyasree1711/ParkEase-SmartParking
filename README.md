@@ -6,7 +6,7 @@ The system provides **real-time slot availability**, **secure authentication**, 
 ---
 
 ## 🔗 Live Demo
-👉 park-ease-smart-parking.vercel.app
+👉 https://park-ease-smart-parking.vercel.app/
 
 ---
 
@@ -42,7 +42,7 @@ The system provides **real-time slot availability**, **secure authentication**, 
 - LocalStorage (used as temporary database)
 - Simulates backend persistence
 
-**Future Backend (Planned)**
+**Backend**
 - Java Spring Boot
 - REST APIs
 - JWT Authentication
@@ -79,8 +79,4 @@ The system provides **real-time slot availability**, **secure authentication**, 
    - Access Admin Dashboard
    - View analytics and registered users
    - Reset parking slots
-
-
-
-## 🗂️ Project Structure
 
