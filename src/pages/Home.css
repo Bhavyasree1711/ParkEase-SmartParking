@@ -1,0 +1,137 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+}
+
+/* HERO */
+.hero-section {
+  text-align: center;
+  padding: 90px 20px 70px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.hero-section h1 {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero-section h2 {
+  font-size: 24px;
+  margin-top: 10px;
+  font-weight: 500;
+  color: #e0f2f1;
+}
+
+.hero-section p {
+  margin-top: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #cfd8dc;
+}
+
+/* BUTTONS */
+.hero-buttons {
+  margin-top: 35px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.primary-btn {
+  padding: 14px 28px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  padding: 14px 28px;
+  border-radius: 30px;
+  border: 2px solid #4caf50;
+  background: transparent;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ADMIN LINK */
+.admin-link {
+  margin-top: 18px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #90caf9;
+}
+
+.admin-link:hover {
+  text-decoration: underline;
+}
+
+/* ABOUT SECTION */
+.about-section {
+  background: #ffffff;
+  color: #333;
+  padding: 70px 20px;
+}
+
+.about-section h3 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 40px;
+}
+
+.features {
+  max-width: 1000px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.feature-card {
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* FOOTER */
+.home-footer {
+  background: #0f2027;
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: #b0bec5;
+}
