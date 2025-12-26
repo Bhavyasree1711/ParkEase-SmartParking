@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function SlotBooking() {
   const navigate = useNavigate();
 
-  /* 🔐 AUTH GUARD */
+  /* 🔐 AUTH CHECK */
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       alert("Please login first");
@@ -13,78 +13,57 @@ export default function SlotBooking() {
     }
   }, [navigate]);
 
-  /* ✅ SLOT GENERATOR (MUST BE FIRST) */
-  function createSlots(n) {
-    return Array.from({ length: n }, (_, i) => ({
+  const STORAGE_VERSION = "v4";
+
+  function createSlots(count) {
+    return Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       booked: false,
     }));
   }
 
-  /* 🔴 REAL-WORLD PARKING DATA */
-  const initialData = {
+  /* 🏙️ DATA */
+  const defaultData = {
     Bangalore: [
-      {
-        id: 1,
-        name: "Orion Mall",
-        type: "Shopping Mall",
-        slots: createSlots(10),
-      },
-      {
-        id: 2,
-        name: "Apollo Hospital",
-        type: "Hospital",
-        slots: createSlots(8),
-      },
-      {
-        id: 3,
-        name: "PVR Cinemas",
-        type: "Theatre",
-        slots: createSlots(6),
-      },
-      {
-        id: 4,
-        name: "Manyata Tech Park",
-        type: "IT Park",
-        slots: createSlots(12),
-      },
+      { id: 1, name: "Orion Mall", type: "Shopping Mall", slots: createSlots(10) },
+      { id: 2, name: "Forum Mall", type: "Shopping Mall", slots: createSlots(8) },
+      { id: 3, name: "Apollo Hospital", type: "Hospital", slots: createSlots(7) },
+      { id: 4, name: "Manyata Tech Park", type: "IT Park", slots: createSlots(12) },
+      { id: 5, name: "Kempegowda Airport", type: "Airport", slots: createSlots(20) },
     ],
     Chennai: [
-      {
-        id: 1,
-        name: "Phoenix Mall",
-        type: "Shopping Mall",
-        slots: createSlots(9),
-      },
-      {
-        id: 2,
-        name: "MIOT Hospital",
-        type: "Hospital",
-        slots: createSlots(7),
-      },
+      { id: 1, name: "Phoenix Mall", type: "Shopping Mall", slots: createSlots(9) },
+      { id: 2, name: "MIOT Hospital", type: "Hospital", slots: createSlots(6) },
     ],
   };
 
-  /* 🔐 LOAD DATA */
+  /* 🔄 LOAD STORAGE WITH VERSIONING */
   const [data, setData] = useState(() => {
-    const saved = localStorage.getItem("realtimeParking");
-    return saved ? JSON.parse(saved) : initialData;
+    const savedData = localStorage.getItem("realtimeParking");
+    const savedVersion = localStorage.getItem("parkingVersion");
+
+    if (savedData && savedVersion === STORAGE_VERSION) {
+      return JSON.parse(savedData);
+    }
+
+    localStorage.setItem("realtimeParking", JSON.stringify(defaultData));
+    localStorage.setItem("parkingVersion", STORAGE_VERSION);
+    return defaultData;
   });
 
   const [city, setCity] = useState("Bangalore");
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  /* 💾 SAVE TO LOCAL STORAGE */
+  /* 💾 SAVE */
   useEffect(() => {
     localStorage.setItem("realtimeParking", JSON.stringify(data));
   }, [data]);
 
-  /* 🔄 LIVE COUNTS */
+  /* 📊 COUNTS */
   const getCounts = (slots) => {
     const booked = slots.filter((s) => s.booked).length;
     return {
-      total: slots.length,
       booked,
       available: slots.length - booked,
     };
@@ -93,13 +72,12 @@ export default function SlotBooking() {
   /* 🚗 BOOK SLOT */
   const bookSlot = () => {
     if (!selectedSlot) {
-      alert("Select a slot");
+      alert("Please select a slot");
       return;
     }
 
-    setData((prev) => ({
-      ...prev,
-      [city]: prev[city].map((place) =>
+    setData((prev) => {
+      const updatedPlaces = prev[city].map((place) =>
         place.id === selectedPlace.id
           ? {
               ...place,
@@ -108,8 +86,14 @@ export default function SlotBooking() {
               ),
             }
           : place
-      ),
-    }));
+      );
+
+      setSelectedPlace(
+        updatedPlaces.find((p) => p.id === selectedPlace.id)
+      );
+
+      return { ...prev, [city]: updatedPlaces };
+    });
 
     alert("Slot booked successfully");
     setSelectedSlot(null);
@@ -122,44 +106,40 @@ export default function SlotBooking() {
         <h3>Smart Parking</h3>
       </div>
 
-      {/* CITY SELECTION */}
-      <select
-        value={city}
-        onChange={(e) => {
-          setCity(e.target.value);
-          setSelectedPlace(null);
-        }}
-      >
-        {Object.keys(data).map((c) => (
-          <option key={c}>{c}</option>
-        ))}
-      </select>
+      {/* 🟢 STEP 1: PLACE SELECTION */}
+      {!selectedPlace && (
+        <>
+          <select value={city} onChange={(e) => setCity(e.target.value)}>
+            {Object.keys(data).map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
 
-      {/* PLACE LIST */}
-      <h4>Parking Locations</h4>
-      {data[city].map((place) => {
-        const counts = getCounts(place.slots);
+          <h4>Select Parking Location</h4>
 
-        return (
-          <div
-            key={place.id}
-            className="place-card"
-            onClick={() => setSelectedPlace(place)}
-          >
-            <div>
-              <strong>{place.name}</strong>
-              <p>{place.type}</p>
-            </div>
+          {data[city].map((place) => {
+            const counts = getCounts(place.slots);
+            return (
+              <div
+                key={place.id}
+                className="place-card"
+                onClick={() => setSelectedPlace(place)}
+              >
+                <div>
+                  <strong>{place.name}</strong>
+                  <p>{place.type}</p>
+                </div>
+                <div className="counts">
+                  <span className="available">{counts.available} Free</span>
+                  <span className="booked">{counts.booked} Booked</span>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
 
-            <div className="counts">
-              <span className="available">{counts.available} Free</span>
-              <span className="booked">{counts.booked} Booked</span>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* SLOT VIEW */}
+      {/* 🟢 STEP 2: SLOT BOOKING */}
       {selectedPlace && (
         <>
           <h4>{selectedPlace.name} – Slots</h4>
@@ -180,6 +160,16 @@ export default function SlotBooking() {
 
           <button className="book-btn" onClick={bookSlot}>
             Book Slot
+          </button>
+
+          <button
+            className="back-btn"
+            onClick={() => {
+              setSelectedPlace(null);
+              setSelectedSlot(null);
+            }}
+          >
+            ← Back to Locations
           </button>
         </>
       )}
