@@ -7,6 +7,7 @@ export default function AdminDashboard() {
 
   const [parkingData, setParkingData] = useState({});
   const [users, setUsers] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [activeCity, setActiveCity] = useState(null);
   const [activeUser, setActiveUser] = useState(null);
 
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
     }
   }, [navigate]);
 
-  /* 🔄 LOAD OR INITIALIZE DATA */
+  /* 🔄 LOAD DATA */
   useEffect(() => {
     /* PARKING DATA */
     const parking = localStorage.getItem("realtimeParking");
@@ -31,7 +32,7 @@ export default function AdminDashboard() {
       setParkingData({});
     }
 
-    /* USER DATA (SELF INIT IF MISSING) */
+    /* USER DATA */
     let storedUsers = localStorage.getItem("users");
     if (!storedUsers) {
       const defaultUsers = [
@@ -48,9 +49,17 @@ export default function AdminDashboard() {
     } else {
       setUsers(JSON.parse(storedUsers));
     }
+
+    /* 📋 BOOKINGS (MILESTONE 3) */
+    const storedBookings = localStorage.getItem("bookings");
+    if (storedBookings) {
+      setBookings(JSON.parse(storedBookings));
+    } else {
+      setBookings([]);
+    }
   }, []);
 
-  /* 📊 GLOBAL STATS */
+  /* 📊 GLOBAL METRICS */
   let totalCities = Object.keys(parkingData).length;
   let totalPlaces = 0;
   let totalSlots = 0;
@@ -70,7 +79,9 @@ export default function AdminDashboard() {
     <div className="admin-page">
       {/* HEADER */}
       <div className="admin-header">
-        <span className="back-arrow" onClick={() => navigate("/")}>←</span>
+        <span className="back-arrow" onClick={() => navigate("/")}>
+          ←
+        </span>
         <h2>Admin Dashboard</h2>
       </div>
 
@@ -152,6 +163,56 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* 📋 BOOKING OVERVIEW – MILESTONE 3 */}
+      <section className="admin-section">
+        <h3>Booking Overview</h3>
+
+        {bookings.length === 0 && <p>No bookings available</p>}
+
+        {bookings.length > 0 && (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Slot</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration (min)</th>
+                <th>Amount</th>
+                <th>Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((b, index) => (
+                <tr key={index}>
+                  <td>{b.username}</td>
+                  <td>{b.slotId}</td>
+                  <td>
+                    {b.startTime
+                      ? new Date(b.startTime).toLocaleString()
+                      : "-"}
+                  </td>
+                  <td>
+                    {b.endTime
+                      ? new Date(b.endTime).toLocaleString()
+                      : "-"}
+                  </td>
+                  <td>{b.duration || "-"}</td>
+                  <td>{b.amount ? `₹${b.amount}` : "-"}</td>
+                  <td>
+                    {b.paymentStatus === "PAID" ? (
+                      <span style={{ color: "green" }}>PAID</span>
+                    ) : (
+                      <span style={{ color: "red" }}>PENDING</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
     </div>
   );
 }
